@@ -12,6 +12,9 @@ import CoreData
 class CoreDataController {
     // MARK: - Core Data stack
     
+    let apiController = APIController.sharedInstance()
+    
+    
     private init(){
         
     }
@@ -61,5 +64,18 @@ class CoreDataController {
                 fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
             }
         }
+    }
+    
+    func generateCoreDataPin(latitude: Double, longitude: Double){
+        print("There")
+        apiController.performFlickPhotoSearch(latitude: String(latitude), longitude: String(longitude))
+    }
+    
+    //Generate a Singleton instance of the CoreDataController
+    class func sharedInstance() -> CoreDataController {
+        struct Singleton {
+            static var sharedInstance = CoreDataController()
+        }
+        return Singleton.sharedInstance
     }
 }
