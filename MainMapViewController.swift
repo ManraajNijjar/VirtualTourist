@@ -23,7 +23,7 @@ class MainMapViewController: UIViewController {
         
         //Create the gesture recognizer and attach it to the map view
         let longTouchRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(self.addAnnotationOnPress(_:)))
-        longTouchRecognizer.minimumPressDuration = 1.5
+        longTouchRecognizer.minimumPressDuration = 0.5
         mapView.addGestureRecognizer(longTouchRecognizer)
         
     }
