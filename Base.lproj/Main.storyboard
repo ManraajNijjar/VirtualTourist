@@ -50,7 +50,7 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Virtual Toursit" id="5vY-jn-i9r">
-                        <barButtonItem key="rightBarButtonItem" style="plain" id="uFM-qv-OBR">
+                        <barButtonItem key="rightBarButtonItem" id="uFM-qv-OBR">
                             <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="bnN-Vt-iqE">
                                 <rect key="frame" x="276" y="7" width="83" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>

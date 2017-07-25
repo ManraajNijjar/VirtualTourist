@@ -67,8 +67,9 @@ class CoreDataController {
     }
     
     func generateCoreDataPin(latitude: Double, longitude: Double){
-        print("There")
-        apiController.performFlickPhotoSearch(latitude: String(latitude), longitude: String(longitude))
+        apiController.performFlickPhotoSearch(latitude: String(latitude), longitude: String(longitude), completionHandler: { (data, error) in
+            // this is where the completion handler code goes
+        })
     }
     
     //Generate a Singleton instance of the CoreDataController
