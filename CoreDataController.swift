@@ -66,7 +66,7 @@ class CoreDataController {
         }
     }
     
-    func generateCoreDataPin(latitude: Double, longitude: Double){
+    func generateCoreDataPin(latitude: Double, longitude: Double, completionHandler: @escaping (_ success: Bool) -> Void){
         apiController.performFlickPhotoSearch(latitude: String(latitude), longitude: String(longitude), completionHandler: { (data, error) in
             // Instantiates a pin
             let pin: Pin = NSEntityDescription.insertNewObject(forEntityName: "Pin", into: CoreDataController.getContext()) as! Pin
@@ -87,9 +87,7 @@ class CoreDataController {
                 pin.addToPhotos(photo)
                 photo.pin = pin
             }
-            print("processed")
-            
-            
+            completionHandler(true)
         })
     }
     

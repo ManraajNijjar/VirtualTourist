@@ -35,7 +35,11 @@ class MainMapViewController: UIViewController {
         let touchLocation = sender.location(in: mapView)
         let locationCoordinate = mapView.convert(touchLocation, toCoordinateFrom: mapView)
         if sender.state == UIGestureRecognizerState.ended {
-            coreDataController.generateCoreDataPin(latitude: locationCoordinate.latitude, longitude: locationCoordinate.longitude)
+            coreDataController.generateCoreDataPin(latitude: locationCoordinate.latitude, longitude: locationCoordinate.longitude, completionHandler: { (success) in
+                if success {
+                    CoreDataController.saveContext()
+                }
+            })
         }
     }
     
