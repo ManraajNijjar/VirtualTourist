@@ -8,6 +8,7 @@
 
 import UIKit
 import MapKit
+import CoreData
 
 class MainMapViewController: UIViewController {
     
@@ -26,6 +27,8 @@ class MainMapViewController: UIViewController {
         longTouchRecognizer.minimumPressDuration = 0.5
         mapView.addGestureRecognizer(longTouchRecognizer)
         
+        
+        annotateMap()
     }
     
     //Activates when a long pressis done on the Map View
@@ -34,12 +37,31 @@ class MainMapViewController: UIViewController {
         //Gets the location on where the sender is pressed and stores it in the locationCoordinate
         let touchLocation = sender.location(in: mapView)
         let locationCoordinate = mapView.convert(touchLocation, toCoordinateFrom: mapView)
+        //Determines if the touch is leaving the screen or not.
         if sender.state == UIGestureRecognizerState.ended {
             coreDataController.generateCoreDataPin(latitude: locationCoordinate.latitude, longitude: locationCoordinate.longitude, completionHandler: { (success) in
+                //Completion handler determines if the operation was a success and thus chooses to save context
                 if success {
                     CoreDataController.saveContext()
+                    
+                    //Send a request into the main thread to update the UI
+                    DispatchQueue.main.async { [unowned self] in
+                        self.annotateMap()
+                    }
                 }
             })
+        }
+    }
+    
+    //Grabs the pin data from the core data controller
+    func annotateMap() {
+        mapView.removeAnnotations(mapView.annotations)
+        let pins = coreDataController.fetchAllPins()
+        
+        for pin in pins {
+            let annotation = MKPointAnnotation()
+            annotation.coordinate = CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude)
+            mapView.addAnnotation(annotation)
         }
     }
     

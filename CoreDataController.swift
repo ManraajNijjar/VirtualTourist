@@ -68,6 +68,7 @@ class CoreDataController {
     
     func generateCoreDataPin(latitude: Double, longitude: Double, completionHandler: @escaping (_ success: Bool) -> Void){
         apiController.performFlickPhotoSearch(latitude: String(latitude), longitude: String(longitude), completionHandler: { (data, error) in
+            //Completion handler grabs the results from the API search and turns it into Pin data
             // Instantiates a pin
             let pin: Pin = NSEntityDescription.insertNewObject(forEntityName: "Pin", into: CoreDataController.getContext()) as! Pin
             pin.latitude = latitude
@@ -79,8 +80,9 @@ class CoreDataController {
             guard let photosList = photosDictionary["photo"] as? [[String: AnyObject]] else {
                 return
             }
+            
+            //Build each photo object and attach it to the pin
             for photoModel in photosList {
-                //print(photoModel["url_m"] ?? "badaching")
                 
                 let photo: Photo = NSEntityDescription.insertNewObject(forEntityName: "Photo", into: CoreDataController.getContext()) as! Photo
                 photo.photoURL = photoModel["url_m"] as? String
@@ -89,6 +91,23 @@ class CoreDataController {
             }
             completionHandler(true)
         })
+    }
+    
+    //Fetches the data on all pins from Core Data and returns it in an array
+    func fetchAllPins() -> [Pin] {
+        //Move this to the core data controller
+        var pinsFromFetch = [Pin]()
+        
+        //Makes the fetch request for pins
+        let fetchRequest: NSFetchRequest<Pin> = Pin.fetchRequest()
+        do {
+            pinsFromFetch = try CoreDataController.getContext().fetch(fetchRequest)
+            print("Number of Results: \(pinsFromFetch.count)")
+            
+        } catch {
+            print(error)
+        }
+        return pinsFromFetch
     }
     
     //Generate a Singleton instance of the CoreDataController
