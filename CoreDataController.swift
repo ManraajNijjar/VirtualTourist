@@ -9,10 +9,12 @@
 import Foundation
 import CoreData
 
+
 class CoreDataController {
     // MARK: - Core Data stack
     
     let apiController = APIController.sharedInstance()
+    var pinsList = [Pin]()
     
     
     private init(){
@@ -107,7 +109,31 @@ class CoreDataController {
         } catch {
             print(error)
         }
+        pinsList = pinsFromFetch
         return pinsFromFetch
+    }
+    
+    func fetchPinForCoords(valueForLongitude: Double, valueForLatitude: Double) -> Pin {
+        //var pinForCoords = Pin()
+        print(valueForLongitude)
+        print(valueForLatitude)
+        
+        let fetchRequest: NSFetchRequest<Pin> = Pin.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "longitude == %@", String(valueForLongitude))
+        //fetchRequest.predicate = NSPredicate(format: "latitude == %@", valueForLatitude)
+        print(fetchRequest.predicate!)
+        do {
+            //Returns an array of pins so we'll just grab the first value from it
+            let results = try CoreDataController.getContext().fetch(fetchRequest)
+            print(results.count)
+            print(results.first!)
+            return results.first!
+            
+        } catch {
+            print(error)
+        }
+        
+        return Pin()
     }
     
     //Generate a Singleton instance of the CoreDataController

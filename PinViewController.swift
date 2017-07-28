@@ -19,7 +19,8 @@ class PinViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        print(pinForPinView.latitude)
+        print(pinForPinView.longitude)
         // Do any additional setup after loading the view.
     }
 

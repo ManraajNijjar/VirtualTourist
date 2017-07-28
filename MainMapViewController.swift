@@ -10,7 +10,7 @@ import UIKit
 import MapKit
 import CoreData
 
-class MainMapViewController: UIViewController, MKMapViewDelegate {
+class MainMapViewController: UIViewController{
     
     //Create connections for the storyboard view
     @IBOutlet weak var mapView: MKMapView!
@@ -18,6 +18,8 @@ class MainMapViewController: UIViewController, MKMapViewDelegate {
     @IBOutlet weak var editButton: UIButton!
     
     let coreDataController = CoreDataController.sharedInstance()
+    
+    var selectedPin : Pin!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -62,15 +64,38 @@ class MainMapViewController: UIViewController, MKMapViewDelegate {
         
         for pin in pins {
             let annotation = MKPointAnnotation()
+            annotation.title = "View Photos"
+            print(pin.longitude)
+            print(pin.latitude)
             annotation.coordinate = CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude)
             mapView.addAnnotation(annotation)
         }
     }
     
     
+    @IBAction func editButtonPressed(_ sender: Any) {
+        
+        
+    }
+
+    
+    // MARK: - Navigation
+
+    // In a storyboard-based application, you will often want to do a little preparation before navigation
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "SegueToCollection" {
+            let viewController = segue.destination as! PinViewController
+            viewController.pinForPinView = selectedPin
+        }
+    }
+
+}
+
+//Handles the delegate methods for the MainMapViewController
+extension MainMapViewController: MKMapViewDelegate {
     //Create the button that allows you to move to the collection view from clicking on an annotation
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-        let reuseId = "pinso"
+        let reuseId = "pinId"
         
         var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseId) as? MKPinAnnotationView
         
@@ -88,26 +113,12 @@ class MainMapViewController: UIViewController, MKMapViewDelegate {
     }
     
     func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl){
+        let coordinateValueForPin = view.annotation?.coordinate
+        print("Selected")
+        print((coordinateValueForPin?.longitude)!)
+        print((coordinateValueForPin?.latitude)!)
+        self.selectedPin = coreDataController.fetchPinForCoords(valueForLongitude: (coordinateValueForPin?.longitude)!, valueForLatitude: (coordinateValueForPin?.latitude)!)
         performSegue(withIdentifier: "SegueToCollection", sender: self)
     }
     
-    
-    @IBAction func editButtonPressed(_ sender: Any) {
-        
-    }
-    
-    
-    
-    
-    
-
-    
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-
 }
