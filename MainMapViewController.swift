@@ -10,7 +10,7 @@ import UIKit
 import MapKit
 import CoreData
 
-class MainMapViewController: UIViewController {
+class MainMapViewController: UIViewController, MKMapViewDelegate {
     
     //Create connections for the storyboard view
     @IBOutlet weak var mapView: MKMapView!
@@ -21,6 +21,8 @@ class MainMapViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        //Set the delegate to itself
+        mapView.delegate = self
         
         //Create the gesture recognizer and attach it to the map view
         let longTouchRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(self.addAnnotationOnPress(_:)))
@@ -65,6 +67,29 @@ class MainMapViewController: UIViewController {
         }
     }
     
+    
+    //Create the button that allows you to move to the collection view from clicking on an annotation
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        let reuseId = "pinso"
+        
+        var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseId) as? MKPinAnnotationView
+        
+        if pinView == nil {
+            pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
+            pinView!.canShowCallout = true
+            pinView!.pinTintColor = .red
+            pinView!.rightCalloutAccessoryView = UIButton(type: .infoDark)
+        }
+        else {
+            pinView!.annotation = annotation
+        }
+        
+        return pinView
+    }
+    
+    func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl){
+        performSegue(withIdentifier: "SegueToCollection", sender: self)
+    }
     
     
     @IBAction func editButtonPressed(_ sender: Any) {
