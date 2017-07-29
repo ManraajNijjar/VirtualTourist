@@ -113,14 +113,15 @@ class CoreDataController {
         return pinsFromFetch
     }
     
-    func fetchPinForCoords(valueForLongitude: Double, valueForLatitude: Double) -> Pin {
+    func fetchPinForCoords(valueForLongitude: Double, valueForLatitude: Double, marginOfError: Double) -> Pin {
         //var pinForCoords = Pin()
         print(valueForLongitude)
         print(valueForLatitude)
         
         let fetchRequest: NSFetchRequest<Pin> = Pin.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "longitude == %@", String(valueForLongitude))
-        //fetchRequest.predicate = NSPredicate(format: "latitude == %@", valueForLatitude)
+        //Try switching the data model to Strings to make it search for that instead or just search through each value in all returned pisn Or just convert it to a range with a small margin of error
+        fetchRequest.predicate = NSPredicate(format: "longitude >= \(valueForLongitude - marginOfError) AND longitude <= \(valueForLongitude + marginOfError) AND latitude >= \(valueForLatitude - marginOfError) AND latitude <= \(valueForLatitude + marginOfError)")
+        
         print(fetchRequest.predicate!)
         do {
             //Returns an array of pins so we'll just grab the first value from it

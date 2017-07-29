@@ -117,7 +117,7 @@ extension MainMapViewController: MKMapViewDelegate {
         print("Selected")
         print((coordinateValueForPin?.longitude)!)
         print((coordinateValueForPin?.latitude)!)
-        self.selectedPin = coreDataController.fetchPinForCoords(valueForLongitude: (coordinateValueForPin?.longitude)!, valueForLatitude: (coordinateValueForPin?.latitude)!)
+        self.selectedPin = coreDataController.fetchPinForCoords(valueForLongitude: (coordinateValueForPin?.longitude)!, valueForLatitude: (coordinateValueForPin?.latitude)!, marginOfError: 0.0001)
         performSegue(withIdentifier: "SegueToCollection", sender: self)
     }
     
