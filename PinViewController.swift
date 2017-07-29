@@ -19,8 +19,7 @@ class PinViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        print(pinForPinView.latitude)
-        print(pinForPinView.longitude)
+        mapSetup()
         // Do any additional setup after loading the view.
     }
 
@@ -29,15 +28,15 @@ class PinViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+    //Sets up the map view properly. Called when the view loads
+    func mapSetup(){
+        let mapCenter = CLLocationCoordinate2D(latitude: pinForPinView.latitude, longitude: pinForPinView.longitude)
+        let span = MKCoordinateSpan(latitudeDelta: 1, longitudeDelta: 1)
+        let region = MKCoordinateRegion(center: mapCenter, span: span)
+        mapView.setRegion(region, animated: false)
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = mapCenter
+        mapView.addAnnotation(annotation)
     }
-    */
-
+    
 }
