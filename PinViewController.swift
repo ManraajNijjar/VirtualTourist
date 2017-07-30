@@ -18,6 +18,8 @@ class PinViewController: UIViewController {
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
     
     var pinForPinView: Pin!
+    
+    var photoSet : [Photo] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,6 +27,8 @@ class PinViewController: UIViewController {
         collectionView.dataSource = self
         collectionView.delegate = self
         adjustFlowLayout(viewSize: view.frame.size)
+        photoSet = Array(pinForPinView.photos as! Set<Photo>)
+        print(photoSet.count)
         // Do any additional setup after loading the view.
     }
 
@@ -68,9 +72,15 @@ extension PinViewController: UICollectionViewDataSource, UICollectionViewDelegat
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCollectionViewCell", for: indexPath) as! PhotoCollectionViewCell
         
-        cell.label.text = String(indexPath.row)
+        print(photoSet[indexPath.row].photoURL)
+        
+        cell.label.text = "Loading..."
         
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        print(indexPath.row)
     }
     
     
