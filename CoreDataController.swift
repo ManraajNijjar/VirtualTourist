@@ -144,10 +144,12 @@ class CoreDataController {
                 completionHandlerForFetch(false)
                 return
             }
-            photo.photo = data as? NSData
-            
-            completionHandlerForFetch(true)
-            
+            if let newData = data as? NSData {
+                photo.photo = newData
+                completionHandlerForFetch(true)
+            } else {
+            completionHandlerForFetch(false)
+            }
         })
         
     }

@@ -19,9 +19,15 @@ class PinViewController: UIViewController {
     
     let coreDataController = CoreDataController.sharedInstance()
     
+    let queue = DispatchQueue(label: "com.appcoda.myqueue")
+    
     var pinForPinView: Pin!
     
     var photoSet : [Photo] = []
+    
+    override func loadView() {
+        super.loadView()
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -64,11 +70,14 @@ class PinViewController: UIViewController {
     
 }
 
+
+
+
 extension PinViewController: UICollectionViewDataSource, UICollectionViewDelegate {
     
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 25
+        return photoSet.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -76,22 +85,31 @@ extension PinViewController: UICollectionViewDataSource, UICollectionViewDelegat
         let currentPhoto = photoSet[indexPath.row]
         
         cell.label.text = "Loading..."
+        print("Loading Cell \(indexPath.row)")
         
-        if currentPhoto.photo == nil {
-            coreDataController.fetchImageForPhoto(photo: currentPhoto, completionHandlerForFetch: { (success) in
-                //Completion handler determines if the operation was a success and thus chooses to save context
-                if success {
-                    CoreDataController.saveContext()
-                    //Send a request into the main thread to update the UI
-                    DispatchQueue.main.async { [unowned self] in
-                        cell.imageView.image = UIImage(data:currentPhoto.photo! as Data,scale:1.0)
+        queue.async {
+            if currentPhoto.photo == nil {
+                self.coreDataController.fetchImageForPhoto(photo: currentPhoto, completionHandlerForFetch: { (success) in
+                    //Completion handler determines if the operation was a success and thus chooses to save context
+                    if success {
+                        CoreDataController.saveContext()
+                        //Send a request into the main thread to update the UI
+                        DispatchQueue.main.async { [unowned self] in
+                            cell.imageView.image = UIImage(data:currentPhoto.photo! as Data,scale:1.0)
+                            cell.label.text = " "
+                        }
+                    } else {
+                        DispatchQueue.main.async { [unowned self] in
+                            cell.label.text = "Failed"
+                        }
                     }
-                } else {
-                    DispatchQueue.main.async { [unowned self] in
-                        cell.label.text = "Failed"
-                    }
+                })
+            } else {
+                DispatchQueue.main.async { [unowned self] in
+                    cell.imageView.image = UIImage(data:currentPhoto.photo! as Data,scale:1.0)
+                    cell.label.text = " "
                 }
-            })
+            }
         }
         
         

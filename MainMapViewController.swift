@@ -65,8 +65,6 @@ class MainMapViewController: UIViewController{
         for pin in pins {
             let annotation = MKPointAnnotation()
             annotation.title = "View Photos"
-            print(pin.longitude)
-            print(pin.latitude)
             annotation.coordinate = CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude)
             mapView.addAnnotation(annotation)
         }
@@ -114,9 +112,6 @@ extension MainMapViewController: MKMapViewDelegate {
     
     func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl){
         let coordinateValueForPin = view.annotation?.coordinate
-        print("Selected")
-        print((coordinateValueForPin?.longitude)!)
-        print((coordinateValueForPin?.latitude)!)
         self.selectedPin = coreDataController.fetchPinForCoords(valueForLongitude: (coordinateValueForPin?.longitude)!, valueForLatitude: (coordinateValueForPin?.latitude)!, marginOfError: 0.0001)
         performSegue(withIdentifier: "SegueToCollection", sender: self)
     }
