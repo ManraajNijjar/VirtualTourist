@@ -61,7 +61,9 @@ class PinViewController: UIViewController {
         for photo in photoSet {
             coreDataController.deletePhoto(photo: photo, completionHandlerForDelete: {})
         }
+        
         CoreDataController.saveContext()
+        
         coreDataController.refreshPinData(pinForRefresh: pinForPinView) { (success) in
             CoreDataController.saveContext()
             self.photoSet = Array(self.pinForPinView.photos as! Set<Photo>)

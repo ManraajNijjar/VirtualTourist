@@ -20,6 +20,8 @@ class MainMapViewController: UIViewController{
     let coreDataController = CoreDataController.sharedInstance()
     
     var selectedPin : Pin!
+    
+    var editMode = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -41,19 +43,25 @@ class MainMapViewController: UIViewController{
         //Gets the location on where the sender is pressed and stores it in the locationCoordinate
         let touchLocation = sender.location(in: mapView)
         let locationCoordinate = mapView.convert(touchLocation, toCoordinateFrom: mapView)
-        //Determines if the touch is leaving the screen or not.
-        if sender.state == UIGestureRecognizerState.ended {
-            coreDataController.generateCoreDataPin(latitude: locationCoordinate.latitude, longitude: locationCoordinate.longitude, completionHandler: { (success) in
-                //Completion handler determines if the operation was a success and thus chooses to save context
-                if success {
-                    CoreDataController.saveContext()
-                    
-                    //Send a request into the main thread to update the UI
-                    DispatchQueue.main.async { [unowned self] in
-                        self.annotateMap()
+        if !editMode {
+            //Determines if the touch is leaving the screen or not.
+            if sender.state == UIGestureRecognizerState.ended {
+                coreDataController.generateCoreDataPin(latitude: locationCoordinate.latitude, longitude: locationCoordinate.longitude, completionHandler: { (success) in
+                    //Completion handler determines if the operation was a success and thus chooses to save context
+                    if success {
+                        CoreDataController.saveContext()
+                        
+                        //Send a request into the main thread to update the UI
+                        DispatchQueue.main.async { [unowned self] in
+                            self.annotateMap()
+                        }
                     }
-                }
-            })
+                })
+            }
+        }
+        //Add this part of the method later when touching up
+        if editMode {
+            //print(locationCoordinate)
         }
     }
     
@@ -72,7 +80,15 @@ class MainMapViewController: UIViewController{
     
     
     @IBAction func editButtonPressed(_ sender: Any) {
-        
+        editMode = !editMode
+        if editMode {
+            editButton.setTitle("End", for: .normal)
+            editButton.setTitleColor(.red, for: .normal)
+        }
+        if !editMode {
+            editButton.setTitle("Edit", for: .normal)
+            editButton.setTitleColor(.blue, for: .normal)
+        }
         
     }
 

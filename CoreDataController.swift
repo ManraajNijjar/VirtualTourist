@@ -171,6 +171,9 @@ class CoreDataController {
         
     }
     
+    
+    
+    //Deletes a photo and takes a completion handler
     func deletePhoto(photo: Photo, completionHandlerForDelete: () -> Void){
         let context = CoreDataController.getContext()
         context.delete(photo)
