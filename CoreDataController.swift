@@ -137,6 +137,21 @@ class CoreDataController {
         return Pin()
     }
     
+    func fetchImageForPhoto(photo: Photo, completionHandlerForFetch: @escaping (_ success: Bool) -> Void){
+        let photoURL = URL(string: photo.photoURL!)
+        let _ = apiController.retrieveImageData(photoURL: photoURL!, completionHandlerForURL: { (data, error) in
+            guard error == nil else {
+                completionHandlerForFetch(false)
+                return
+            }
+            photo.photo = data as? NSData
+            
+            completionHandlerForFetch(true)
+            
+        })
+        
+    }
+    
     //Generate a Singleton instance of the CoreDataController
     class func sharedInstance() -> CoreDataController {
         struct Singleton {

@@ -17,6 +17,8 @@ class PinViewController: UIViewController {
     
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
     
+    let coreDataController = CoreDataController.sharedInstance()
+    
     var pinForPinView: Pin!
     
     var photoSet : [Photo] = []
@@ -71,10 +73,27 @@ extension PinViewController: UICollectionViewDataSource, UICollectionViewDelegat
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCollectionViewCell", for: indexPath) as! PhotoCollectionViewCell
-        
-        print(photoSet[indexPath.row].photoURL)
+        let currentPhoto = photoSet[indexPath.row]
         
         cell.label.text = "Loading..."
+        
+        if currentPhoto.photo == nil {
+            coreDataController.fetchImageForPhoto(photo: currentPhoto, completionHandlerForFetch: { (success) in
+                //Completion handler determines if the operation was a success and thus chooses to save context
+                if success {
+                    CoreDataController.saveContext()
+                    //Send a request into the main thread to update the UI
+                    DispatchQueue.main.async { [unowned self] in
+                        cell.imageView.image = UIImage(data:currentPhoto.photo! as Data,scale:1.0)
+                    }
+                } else {
+                    DispatchQueue.main.async { [unowned self] in
+                        cell.label.text = "Failed"
+                    }
+                }
+            })
+        }
+        
         
         return cell
     }
