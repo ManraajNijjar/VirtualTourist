@@ -24,10 +24,6 @@ class PinViewController: UIViewController {
     var pinForPinView: Pin!
     
     var photoSet : [Photo] = []
-    
-    override func loadView() {
-        super.loadView()
-    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,13 +32,6 @@ class PinViewController: UIViewController {
         collectionView.delegate = self
         adjustFlowLayout(viewSize: view.frame.size)
         photoSet = Array(pinForPinView.photos as! Set<Photo>)
-        print(photoSet.count)
-        // Do any additional setup after loading the view.
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -68,6 +57,19 @@ class PinViewController: UIViewController {
         mapView.addAnnotation(annotation)
     }
     
+    @IBAction func refreshPressed(_ sender: Any) {
+        for photo in photoSet {
+            coreDataController.deletePhoto(photo: photo, completionHandlerForDelete: {})
+        }
+        CoreDataController.saveContext()
+        coreDataController.refreshPinData(pinForRefresh: pinForPinView) { (success) in
+            CoreDataController.saveContext()
+            self.photoSet = Array(self.pinForPinView.photos as! Set<Photo>)
+            self.collectionView.reloadData()
+        }
+    }
+    
+    
 }
 
 
@@ -85,7 +87,6 @@ extension PinViewController: UICollectionViewDataSource, UICollectionViewDelegat
         let currentPhoto = photoSet[indexPath.row]
         
         cell.label.text = "Loading..."
-        print("Loading Cell \(indexPath.row)")
         
         queue.async {
             if currentPhoto.photo == nil {
@@ -117,7 +118,13 @@ extension PinViewController: UICollectionViewDataSource, UICollectionViewDelegat
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print(indexPath.row)
+        coreDataController.deletePhoto(photo: photoSet[indexPath.row], completionHandlerForDelete: {
+            CoreDataController.saveContext()
+            pinForPinView = coreDataController.fetchPinForCoords(valueForLongitude: pinForPinView.longitude, valueForLatitude: pinForPinView.latitude, marginOfError: 0.00001)
+            photoSet = Array(pinForPinView.photos as! Set<Photo>)
+            collectionView.reloadData()
+            
+        })
     }
     
     

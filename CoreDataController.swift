@@ -95,6 +95,30 @@ class CoreDataController {
         })
     }
     
+    //Refreshes the photo data in the pin
+    func refreshPinData(pinForRefresh: Pin, completionHandler: @escaping (_ success: Bool) -> Void){
+        apiController.performFlickPhotoSearch(latitude: String(pinForRefresh.latitude), longitude: String(pinForRefresh.longitude), completionHandler: { (data, error) in
+            //Completion handler grabs the results from the API search and turns it into Pin data
+            // Instantiates a pin
+            guard let photosDictionary = data!["photos"] as? [String:AnyObject] else {
+                return
+            }
+            guard let photosList = photosDictionary["photo"] as? [[String: AnyObject]] else {
+                return
+            }
+            
+            //Build each photo object and attach it to the pin
+            for photoModel in photosList {
+                
+                let photo: Photo = NSEntityDescription.insertNewObject(forEntityName: "Photo", into: CoreDataController.getContext()) as! Photo
+                photo.photoURL = photoModel["url_m"] as? String
+                pinForRefresh.addToPhotos(photo)
+                photo.pin = pinForRefresh
+            }
+            completionHandler(true)
+        })
+    }
+    
     //Fetches the data on all pins from Core Data and returns it in an array
     func fetchAllPins() -> [Pin] {
         //Move this to the core data controller
@@ -104,7 +128,6 @@ class CoreDataController {
         let fetchRequest: NSFetchRequest<Pin> = Pin.fetchRequest()
         do {
             pinsFromFetch = try CoreDataController.getContext().fetch(fetchRequest)
-            print("Number of Results: \(pinsFromFetch.count)")
             
         } catch {
             print(error)
@@ -114,20 +137,13 @@ class CoreDataController {
     }
     
     func fetchPinForCoords(valueForLongitude: Double, valueForLatitude: Double, marginOfError: Double) -> Pin {
-        //var pinForCoords = Pin()
-        print(valueForLongitude)
-        print(valueForLatitude)
-        
         let fetchRequest: NSFetchRequest<Pin> = Pin.fetchRequest()
         //Try switching the data model to Strings to make it search for that instead or just search through each value in all returned pisn Or just convert it to a range with a small margin of error
         fetchRequest.predicate = NSPredicate(format: "longitude >= \(valueForLongitude - marginOfError) AND longitude <= \(valueForLongitude + marginOfError) AND latitude >= \(valueForLatitude - marginOfError) AND latitude <= \(valueForLatitude + marginOfError)")
         
-        print(fetchRequest.predicate!)
         do {
             //Returns an array of pins so we'll just grab the first value from it
             let results = try CoreDataController.getContext().fetch(fetchRequest)
-            print(results.count)
-            print(results.first!)
             return results.first!
             
         } catch {
@@ -137,6 +153,7 @@ class CoreDataController {
         return Pin()
     }
     
+    //Makes a request to the API Controller to retrieve the image data and sets it to the photo if succesful
     func fetchImageForPhoto(photo: Photo, completionHandlerForFetch: @escaping (_ success: Bool) -> Void){
         let photoURL = URL(string: photo.photoURL!)
         let _ = apiController.retrieveImageData(photoURL: photoURL!, completionHandlerForURL: { (data, error) in
@@ -152,6 +169,12 @@ class CoreDataController {
             }
         })
         
+    }
+    
+    func deletePhoto(photo: Photo, completionHandlerForDelete: () -> Void){
+        let context = CoreDataController.getContext()
+        context.delete(photo)
+        completionHandlerForDelete()
     }
     
     //Generate a Singleton instance of the CoreDataController
