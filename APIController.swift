@@ -10,7 +10,7 @@ import Foundation
 
 class APIController {
     
-    let apiKey = "8e8d723c5110ca9adcb358222661a3b9"
+    let apiKey = ""
     let apiSecret = ""
     
     func performFlickPhotoSearch(latitude: String, longitude: String, completionHandler: @escaping (_ result: AnyObject?, _ error: NSError?) -> Void){
